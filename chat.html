@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html>
+   <head>
+		<title>Simple chat - WebSocket - Node + HTML5</title>
+		<script src="client.js"></script>
+		<script>
+			var sock = new Socket();
+		</script>
+   </head>
+   <body>
+   
+      <div id="box">
+         <input type="text" placeholder="Put the message here..." value="" id="message" />
+		 <input type="button" value="Send message" id="send" onclick="sock.sendMessage('teste');" />
+      </div>
+      
+   </body>
+</html>
