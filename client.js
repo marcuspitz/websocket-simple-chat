@@ -1,8 +1,15 @@
 
 var Socket = function() {
-	// Let us open a web socket
+	
+	//Open a ws connection, with custom protocol
 	var ws = new WebSocket("ws://localhost:8080/", "server-side-custom-protocol");
+	
 	ws.connected = false;
+	
+	//On close webpage
+	window.onbeforeunload = function(event) {
+	  ws.close();
+	};
 	
 	this.sendMessage = function (message) {		
 		if (ws.connected == true) {
@@ -13,26 +20,19 @@ var Socket = function() {
 		}
 	}
 
-	ws.onopen = function()
-	{
+	ws.onopen = function() {
 	  //ws.send("Message to send");
 	  alert("Connected");
 	  ws.connected = true;
 	};
 
-	ws.onmessage = function (evt) 
-	{ 
+	ws.onmessage = function (evt) { 
 	  var received_msg = evt.data;
 	  alert("Message is received:" + received_msg);
 	};
 
-	ws.onclose = function()
-	{ 
+	ws.onclose = function() { 
 	  alert("Connection is closed..."); 
-	};
-		
-	window.onbeforeunload = function(event) {
-	  ws.close();
-	};
+	};	
 	
 };
