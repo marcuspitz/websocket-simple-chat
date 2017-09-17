@@ -7,15 +7,15 @@ var server = require('./server.js');
 
 var ws = new server.WebServer();
 
-ws.on('connect', function(connection) {
+ws.on('connect', (connection) => {
 	ws.log('Connect on CHAT');
 });
 
-ws.on('message', function(type, message) {
+ws.on('message', (type, message) => {
 	ws.log('Message on CHAT:' + message);
 });
 
-ws.on('disconnect', function(connection) {
+ws.on('disconnect', (connection) => {
 	ws.log('Disconect from CHAT');
 });
 
