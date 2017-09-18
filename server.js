@@ -31,7 +31,7 @@ exports.WebServer =  function WebServer () {
 		autoAcceptConnections: false
 	});
 	
-	this.on = (type, listener) => {
+	this.on = (type, listener) => {		
 		type = type.toLowerCase();
 		if (type === 'connect') {
 			this.onConnectListener = listener;
@@ -49,11 +49,19 @@ exports.WebServer =  function WebServer () {
 		}
 	}
 	
-	this.sendBroadcastMessage = (message, ignore, type='utf8') => {
-		ignore = ignore || '';
-		clients.forEach( (c) => {
-			
-		}); 
+	this.send = (client, message, type='utf8') => {
+		if (type === 'utf8') {
+			client.sendUTF(message);
+		} else {
+			client.sendBytes(message);
+		}
+	}
+	
+	this.sendBroadcastMessage = (message, type='utf8') => {
+		this.log('oi:' + clients);
+		for (c in clients) {
+			this.send(clients[c], message, type);			
+		};
 	}	
 
 	socket.on('request', (request) => {
@@ -67,25 +75,23 @@ exports.WebServer =  function WebServer () {
 		const connection = request.accept('server-side-custom-protocol', request.origin);
 		connection.clientName = "client"+new Date().getTime();
 		clients[connection.clientName] = connection;
-		onConnectListener(connection);
-		this.log('Connection from ' + request.origin + ' was accepted.');
+		this.onConnectListener(connection);
+		this.log('Connection from ' + request.origin + ' was accepted:' + connection.clientName);
 		
 		connection.on('message', (message) => {
 			if (message.type === 'utf8') {
 				this.log('Received Message: ' + message.utf8Data + ', from: ' + connection.clientName);
-				connection.sendUTF(message.utf8Data);
-				onMessageListener(message.type, message.utf8Data);
+				this.onMessageListener(message.type, message.utf8Data);
 			} else if (message.type === 'binary') {
 				this.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-				connection.sendBytes(message.binaryData);
-				onMessageListener(message.type, message.binaryData);
+				this.onMessageListener(message.type, message.binaryData);
 			}			
 		});
 		
 		connection.on('close', (reasonCode, description) => {
 			this.log('Connection ' + connection.clientName + ' was disconnected.');
 			delete clients[connection.clientName];
-			onCloseConnectionListener(connection);
+			this.onCloseConnectionListener(connection);
 		});
 		
 	});

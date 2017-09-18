@@ -9,13 +9,31 @@ var ws = new server.WebServer();
 
 ws.on('connect', (connection) => {
 	ws.log('Connect on CHAT');
+	connection.data.logged = false;
 });
 
 ws.on('message', (type, message) => {
 	ws.log('Message on CHAT:' + message);
+	
+	/**
+	Protocol loggin:
+	{
+		type: loggin,
+		nick: nick_name
+	}
+	Protocol message:
+	{
+		type: message,
+		msg: message
+	}
+	**/
+	
 });
 
 ws.on('disconnect', (connection) => {
 	ws.log('Disconect from CHAT');
+	if (connection.data.logged) {
+		ws.sendBroadcastMessage('');
+	}
 });
 
