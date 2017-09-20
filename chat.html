@@ -2,17 +2,86 @@
 <html>
    <head>
 		<title>Simple chat - WebSocket - Node + HTML5</title>
-		<script src="client.js"></script>
-		<script>
-			var sock = new Socket();
-		</script>
+		
+		<!-- Client Side Web Socket -->
+		<script src="client.js"></script>		
+		
+		<!-- JQuery 3.1.1 core -->
+		<script src="./js/jquery-3.1.1.js"></script> 
+
+		<!-- Bootstrap core CSS -->
+		<link href="./css/bootstrap.css" rel="stylesheet">
+
+		<link href="./css/style.css" rel="stylesheet">
+		
+		<!-- Bootstrap core JS -->
+		<script src="./js/bootstrap.js"></script> 		
+		
    </head>
-   <body>
+   <body>	
    
-      <div id="box">
-         <input type="text" placeholder="Put the message here..." value="" id="message" />
-		 <input type="button" value="Send message" id="send" onclick="sock.sendMessage('teste');" />
-      </div>
+	  <div class="wrapper">      
+		<div class="row">
+			<div class="col-md-2 col-md-offset-5">				
+				<h2 class="form-signin-heading">User name</h2>
+				<div class="form-group">		
+					<div style="display:none" id="user_required" class="alert alert-danger" role="alert">User name is required!</div>
+					<input name="user" type="user" id="user_name" class="form-control" placeholder="User name" autofocus>
+				</div>
+				<button id="bt_loggin" class="btn btn-lg btn-primary btn-block" type="button">Log-in</button>
+			</div>
+			
+		</div>
+		<div class="row spacing">
+			<div class="col-lg-6 col-md-offset-3">
+				<div class="form-group">
+					<textarea id="content-chat" class="form-control" rows="20" readonly></textarea>
+				</div>
+			</div>
+			<div class="col-lg-2 col-md-2">
+				<div class="form-group">
+					<select size="24" multiple class="form-control" id="users_on">					
+				  </select>
+				</div>
+			</div>
+		</div>
+		
+		<div class="row spacing sender">
+			<div class="col-lg-6 col-md-offset-3">
+				<div class="form-group">				
+					<input name="user" readonly type="user" id="message" class="form-control" placeholder="Message...">
+				</div>
+			</div>
+			<div class="col-lg-1 col-md-2">
+				<div class="form-group">				
+					<button id="bt_send" disabled class="btn btn-md btn-primary btn-block" type="button">Send</button>
+				</div>
+			</div>
+		</div>		
+    </div>
       
+	<script>
+		var ws;
+		$('#bt_loggin').on('click', () => {
+			if ($('#user_name').val().length == 0) {
+				$('#user_required').show();
+			} else {
+				$('#user_name').prop('readonly', true);
+				$('#bt_loggin').prop('disabled', true);
+				$('#user_required').hide();
+				$('#message').prop('readonly', false);
+				$('#bt_send').prop('disabled', false);
+				if (!ws) {
+					ws = new Socket();
+				}
+			}
+		});
+		
+		$('#bt_send').on('click', () => {
+			let msg = $('#message').val();
+			$('#message').val('');			
+		});
+	</script>
+	  
    </body>
 </html>

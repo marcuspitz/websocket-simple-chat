@@ -1,0 +1,20 @@
+.spacing {
+	margin-top: 20px;
+}
+
+
+#content-chat {
+
+/* Safari 
+-webkit-transform: rotate(-180deg);*/
+
+/* Firefox 
+-moz-transform: rotate(-180deg);*/
+
+/* IE 
+-ms-transform: rotate(-180deg);*/
+
+/* Opera 
+-o-transform: rotate(-180deg);*/
+	
+}
