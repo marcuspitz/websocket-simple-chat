@@ -9,6 +9,7 @@ var ws = new server.WebServer();
 
 ws.on('connect', (connection) => {
 	ws.log('Connect on CHAT');
+	connection.data = connection.data || {};
 	connection.data.logged = false;
 });
 
