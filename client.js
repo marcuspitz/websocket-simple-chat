@@ -1,8 +1,10 @@
 
-var Socket = function() {
-	
+var Socket = function(on) {
+	on.connect = on.connect || {};
+	on.message = on.message || {};
+	on.disconnect = on.disconnect || {};
 	//Open a ws connection, with custom protocol
-	var ws = new WebSocket("ws://localhost:8080/", "server-side-custom-protocol");
+	let ws = new WebSocket("ws://localhost:8080/", "server-side-custom-protocol");
 	
 	ws.connected = false;
 	
@@ -11,28 +13,30 @@ var Socket = function() {
 	  ws.close();
 	};
 	
-	this.sendMessage = function (message) {		
+	this.sendMessage = (message) => {		
 		if (ws.connected == true) {
-			alert("Sending message:" + message);
+			console.log("Sending message:" + message);
 			ws.send(message);
 		} else {
-			alert("Connecting...");
+			console.log("Connecting...");
 		}
 	}
 
-	ws.onopen = function() {
-	  //ws.send("Message to send");
-	  alert("Connected");
+	ws.onopen = () => {	  
 	  ws.connected = true;
+	  console.log("Connected");
+	  on.connect ();
 	};
 
-	ws.onmessage = function (evt) { 
-	  var received_msg = evt.data;
-	  alert("Message is received:" + received_msg);
+	ws.onmessage = (evt) => { 
+	  let received_msg = evt.data;
+	  console.log("Message received:" + received_msg);
+	  on.message ();
 	};
 
-	ws.onclose = function() { 
-	  alert("Connection is closed..."); 
+	ws.onclose = () => { 
+	  console.log("Connection is closed..."); 
+	  on.disconnect ();
 	};	
 	
 };

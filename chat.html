@@ -72,7 +72,7 @@
 				$('#message').prop('readonly', false);
 				$('#bt_send').prop('disabled', false);
 				if (!ws) {
-					ws = new Socket();
+					ws = new Socket([]);
 				}
 			}
 		});
