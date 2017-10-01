@@ -72,14 +72,58 @@
 				$('#message').prop('readonly', false);
 				$('#bt_send').prop('disabled', false);
 				if (!ws) {
-					ws = new Socket([]);
+					ws = new Socket( {
+						'json'       : true, //Transfer JSON always
+						'path'       : "localhost:8080/",
+						'protocol'   : "server-side-custom-protocol",
+						
+						'connect'    : () => {
+							
+							//Ok... let's to make a log-in (simple protocol)
+							ws.sendMessage (
+								{
+									'type': "loggin",
+									'nick': $('#user_name').val().trim()
+								}
+							);
+							
+						},
+						
+						'message'    : (message) => {
+							if (message.type === 'message') {
+								$("#content-chat").val($("#content-chat").val() + message.user + ' says: ' + message.msg + '\n');
+							} else if (message.type === 'user_enter') {								
+								$("#content-chat").val($("#content-chat").val() + message.user + ' enter.' + '\n');
+							} else if (message.type === 'user_leave') {
+								$("#content-chat").val($("#content-chat").val() + message.user + ' leave.' + '\n');
+							} else if (message.type === 'list_users') {
+								document.getElementById("users_on").options.length = 0;
+								for (u in message.users) {
+									$("#users_on").append(new Option(message.users[u].user, message.users[u].user));
+								}
+							}
+						},
+						
+						'disconnect' : () => {
+							$('#message').prop('readonly', true);
+							$('#bt_send').prop('disabled', true);
+							$("#content-chat").val('');							
+						}
+						
+					} );
 				}
 			}
 		});
 		
 		$('#bt_send').on('click', () => {
-			let msg = $('#message').val();
-			$('#message').val('');			
+			let msg = $('#message').val().trim();
+			$('#message').val('');	
+			ws.sendMessage (
+				{
+					'type': "message",
+					'msg': msg
+				}
+			);			
 		});
 	</script>
 	  

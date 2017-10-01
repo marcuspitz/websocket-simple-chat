@@ -3,7 +3,8 @@
 * Copyright: 2017
 * License: http://www.apache.org/licenses/LICENSE-2.0
 **/
-exports.WebServer =  function WebServer () {	
+exports.WebServer =  function WebServer (config) {
+	config.json = true || config.json;
 	const WebSocketServer = require('websocket').server;
 	const http = require('http');
 	const logEnabled = true;
@@ -11,9 +12,9 @@ exports.WebServer =  function WebServer () {
 	let clients = [];
 	
 	//Listeners
-	let onConnectListener = (connection) => {};
-	let onMessageListener = (type, message) => {};
-	let onCloseConnectionListener = (connection) => {};
+	let onConnectListener = (client) => {};
+	let onMessageListener = (type, message, client) => {};
+	let onCloseConnectionListener = (client) => {};
 	
 	const server = http.createServer( (request, response) => {
 		this.log('HTTP Request are ignored.');
@@ -49,16 +50,18 @@ exports.WebServer =  function WebServer () {
 		}
 	}
 	
+	this.allClients = () => clients;	
+	
 	this.send = (client, message, type='utf8') => {
 		if (type === 'utf8') {
-			client.sendUTF(message);
+			this.log('Sending: ' + config.json ? JSON.stringify(message) : message );
+			client.sendUTF( config.json ? JSON.stringify(message) : message );
 		} else {
 			client.sendBytes(message);
 		}
 	}
 	
 	this.sendBroadcastMessage = (message, type='utf8') => {
-		this.log('oi:' + clients);
 		for (c in clients) {
 			this.send(clients[c], message, type);			
 		};
@@ -80,11 +83,12 @@ exports.WebServer =  function WebServer () {
 		
 		connection.on('message', (message) => {
 			if (message.type === 'utf8') {
-				this.log('Received Message: ' + message.utf8Data + ', from: ' + connection.clientName);
-				this.onMessageListener(message.type, message.utf8Data);
+				let currMsg = config.json ? JSON.parse(message.utf8Data) : message.utf8Data
+				this.log('Received Message: ' + currMsg + ', from: ' + connection.clientName);
+				this.onMessageListener(message.type, currMsg, connection);
 			} else if (message.type === 'binary') {
 				this.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-				this.onMessageListener(message.type, message.binaryData);
+				this.onMessageListener(message.type, message.binaryData, connection);
 			}			
 		});
 		
