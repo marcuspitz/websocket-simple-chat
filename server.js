@@ -35,11 +35,11 @@ exports.WebServer =  function WebServer (config) {
 	this.on = (type, listener) => {		
 		type = type.toLowerCase();
 		if (type === 'connect') {
-			this.onConnectListener = listener;
+			onConnectListener = listener;
 		} else if (type === 'message') {
-			this.onMessageListener = listener;
+			onMessageListener = listener;
 		} else if (type === 'disconnect') {
-			this.onCloseConnectionListener = listener;
+			onCloseConnectionListener = listener;
 		}
 		return this;
 	};
@@ -78,24 +78,24 @@ exports.WebServer =  function WebServer (config) {
 		const connection = request.accept('server-side-custom-protocol', request.origin);
 		connection.clientName = "client"+new Date().getTime();
 		clients[connection.clientName] = connection;
-		this.onConnectListener(connection);
+		onConnectListener(connection);
 		this.log('Connection from ' + request.origin + ' was accepted:' + connection.clientName);
 		
 		connection.on('message', (message) => {
 			if (message.type === 'utf8') {
 				let currMsg = config.json ? JSON.parse(message.utf8Data) : message.utf8Data
 				this.log('Received Message: ' + currMsg + ', from: ' + connection.clientName);
-				this.onMessageListener(message.type, currMsg, connection);
+				onMessageListener(message.type, currMsg, connection);
 			} else if (message.type === 'binary') {
 				this.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-				this.onMessageListener(message.type, message.binaryData, connection);
+				onMessageListener(message.type, message.binaryData, connection);
 			}			
 		});
 		
 		connection.on('close', (reasonCode, description) => {
 			this.log('Connection ' + connection.clientName + ' was disconnected.');
 			delete clients[connection.clientName];
-			this.onCloseConnectionListener(connection);
+			onCloseConnectionListener(connection);
 		});
 		
 	});
