@@ -4,7 +4,7 @@
 * License: http://www.apache.org/licenses/LICENSE-2.0
 **/
 exports.WebServer =  function WebServer (config) {
-	config.json = true || config.json;
+	config.json = false || config.json;
 	const WebSocketServer = require('websocket').server;
 	const http = require('http');
 	const logEnabled = true;
